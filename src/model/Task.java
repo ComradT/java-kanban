@@ -15,13 +15,6 @@ public class Task {
         this.status = status;
     }
 
-    public Task(String name, String description, Status status, int id) {
-        this.name = name;
-        this.description = description;
-        this.status = status;
-        this.id = id;
-    }
-
     public int getId() {
         return id;
     }
@@ -67,4 +60,13 @@ public class Task {
         return id == task.id;
     }
 
+    @Override
+    public String toString() {
+        return "Task{" +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", status=" + status +
+                "id=" + id +
+                '}';
+    }
 }

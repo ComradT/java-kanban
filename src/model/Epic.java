@@ -1,29 +1,40 @@
 package model;
 
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class Epic extends Task {
 
-    private final Set <Integer> subTasks;
+    private final List<SubTask> subTasks = new ArrayList<>();
 
-    public Epic(String name, String description, Status status) {
-        super(name,description, status);
-        this.subTasks = new HashSet<>();
+    public Epic(String name, String description) {
+        super(name, description, Status.NEW);
     }
 
-    public Set<Integer> getSubTasks() {
+    public List<SubTask> getSubTask() {
         return subTasks;
     }
 
-    public void addTask(int subTasksId) {
-        subTasks.add(subTasksId);
-        }
+    public void addTask(SubTask subTasks) {
+        this.subTasks.add(subTasks);
+    }
 
-    public void updateStatus(){
+    public void updateStatus() {
         status = Status.NEW;
     }
 
+    public String toString() {
+        return "Subtask{" +
+                ", name='" + super.getName() + '\'' +
+                ", description='" + super.getDescription() + '\'' +
+                ", status=" + super.getStatus() +
+                "id=" + super.getId() +
+                '}';
+    }
 
 }
+
+
+
