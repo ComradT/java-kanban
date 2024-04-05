@@ -7,19 +7,21 @@ import java.util.List;
 
 public class Epic extends Task {
 
-    private final List<SubTask> subTasks = new ArrayList<>();
+    private final List<Integer> subTasksIds;
 
-    public Epic(String name, String description) {
-        super(name, description, Status.NEW);
+    public Epic(String name, String description, Status status, int id) {
+        super(name, description, status, id);
+        this.subTasksIds = new ArrayList<>();
     }
 
-    public List<SubTask> getSubTask() {
-        return subTasks;
+      public void addSubTasksIds(int subTaskId) {
+        subTasksIds.add(subTaskId);
     }
 
-    public void addTask(SubTask subTasks) {
-        this.subTasks.add(subTasks);
+    public List<Integer> getSubTasksIds() {
+        return subTasksIds;
     }
+
 
     public void updateStatus() {
         status = Status.NEW;

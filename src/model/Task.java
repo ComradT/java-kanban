@@ -7,12 +7,13 @@ public class Task {
     private String name;
     private String description;
     protected Status status;
-    private int id;
+    protected int id = 0;
 
-    public Task(String name, String description, Status status) {
+    public Task(String name, String description, Status status, int id) {
         this.name = name;
         this.description = description;
         this.status = status;
+        this.id = id;
     }
 
     public int getId() {
