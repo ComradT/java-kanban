@@ -8,8 +8,6 @@ class TaskTest {
     @Test
     @DisplayName("Сравнение таксов")
     public void testTwoTasksWithSameId() {
-        Task task = new Task("Test", "desc");
-        Task task2 = new Task("Test", "desc");
         Assertions.assertEquals(task, task2);
     }
 
