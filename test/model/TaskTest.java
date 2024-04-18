@@ -7,7 +7,11 @@ import org.junit.jupiter.api.Test;
 class TaskTest {
     @Test
     @DisplayName("Сравнение таксов")
+
+
     public void testTwoTasksWithSameId() {
+        Task task = new Task("Task 1", "Description 1", Status.NEW);
+        Task task2 = new Task("Task 1", "Description 1", Status.NEW);
         Assertions.assertEquals(task, task2);
     }
 
