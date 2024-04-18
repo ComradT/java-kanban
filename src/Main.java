@@ -2,13 +2,14 @@ import model.Epic;
 import model.Status;
 import model.Task;
 import model.SubTask;
+import service.Managers;
 import service.TaskManager;
 
 public class Main {
 
     public static void main(String[] args) {
         System.out.println("Поехали!"); // добавил тесты
-        TaskManager taskManager = new TaskManager();
+        TaskManager taskManager = Managers.getDefault();
 
         Task task1 = new Task("Магазин", "Сходить в Магнит", Status.NEW, 0);
         Task task2 = new Task("Работа", "Заставить себя встать в 6 утра", Status.NEW, 0);
@@ -18,14 +19,14 @@ public class Main {
         Epic epic1 = new Epic("Яндекс практикум", "Пройти все спринты", Status.NEW, 0);
         taskManager.createEpic(epic1);
         SubTask subTask1 = new SubTask("Спринт 4", "Сдать финальное задание", Status.NEW, 0, epic1.getId());
-        taskManager.createSubtask(subTask1);
+        taskManager.createSubTask(subTask1);
         SubTask subTask2 = new SubTask("Спринт 5", "Заставить себя заниматься в эти выходные", Status.NEW, 0, epic1.getId());
-        taskManager.createSubtask(subTask2);
+        taskManager.createSubTask(subTask2);
 
         Epic epic2 = new Epic("Одежда", "Купить одежду к лету", Status.NEW, 0);
         taskManager.createEpic(epic2);
         SubTask subTask3 = new SubTask("Джинсы", "Выбрать и купить джинсы", Status.NEW, 0, epic2.getId());
-        taskManager.createSubtask(subTask3);
+        taskManager.createSubTask(subTask3);
 
         System.out.println("\nСписок эпиков:");
         for (Epic epic : taskManager.getEpicList()) {
