@@ -1,17 +1,20 @@
 package model;
 
+import java.util.List;
+
 public class SubTask extends Task {
     private int epicId; //
-
-
-    public SubTask(String name, String description, Status status, int id) {
-        super(name, description, status, id);
-    }
 
     public SubTask(String name, String description, Status status, int id, int epicId) {
         super(name, description, status, id);
         this.epicId = epicId;
     }
+
+    public SubTask(String name, String description, Status status, int epicId) {
+        super(name, description);
+        this.epicId = epicId;
+    }
+
 
     public int getEpicId() {
         return epicId;
