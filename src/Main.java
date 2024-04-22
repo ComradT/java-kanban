@@ -18,14 +18,17 @@ public class Main {
 
         Epic epic1 = new Epic("Яндекс практикум", "Пройти все спринты", Status.NEW, 0);
         taskManager.createEpic(epic1);
-        SubTask subTask1 = new SubTask("Спринт 4", "Сдать финальное задание", Status.NEW, 0, epic1.getId());
+        SubTask subTask1 = new SubTask("Спринт 4", "Сдать финальное задание", Status.NEW,
+                0, epic1.getId());
         taskManager.createSubTask(subTask1);
-        SubTask subTask2 = new SubTask("Спринт 5", "Заставить себя заниматься в эти выходные", Status.NEW, 0, epic1.getId());
+        SubTask subTask2 = new SubTask("Спринт 5", "Заставить себя заниматься в эти выходные",
+                Status.NEW, 0, epic1.getId());
         taskManager.createSubTask(subTask2);
 
         Epic epic2 = new Epic("Одежда", "Купить одежду к лету", Status.NEW, 0);
         taskManager.createEpic(epic2);
-        SubTask subTask3 = new SubTask("Джинсы", "Выбрать и купить джинсы", Status.NEW, 0, epic2.getId());
+        SubTask subTask3 = new SubTask("Джинсы", "Выбрать и купить джинсы", Status.NEW,
+                0, epic2.getId());
         taskManager.createSubTask(subTask3);
 
         System.out.println("\nСписок эпиков:");

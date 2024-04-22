@@ -9,25 +9,30 @@ public class Task {
     protected Status status;
     protected int id;
 
-    public Task(String name, String description) {
-        this.name = name;
-        this.description = description;
-     }
-
-    public Task(String name, String description, Status status, int id ) {
+    public Task(String name, String description, Status status, int id) {
         this.name = name;
         this.description = description;
         this.status = status;
         this.id = id;
     }
 
-
-
-    public int getId() {
-        return id;
+    public Task(String name, String description, Status status) {
+        this.name = name;
+        this.description = description;
+        this.status = status;
+        this.id = 0;
+    }
+    public Task(String name, String description) {
+        this.name = name;
+        this.description = description;
+        this.status = Status.NEW;
     }
 
+    public int getId() {
+             return id;
+    }
     public void setId(int id) {
+
         this.id = id;
     }
 

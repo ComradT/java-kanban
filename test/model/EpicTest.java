@@ -4,25 +4,25 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static model.Status.NEW;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class EpicTest {
     @Test
-    @DisplayName("Добавление двух эпиков")
+    @DisplayName("Сравнение двух Epic по ID")
     public void testTwoEpicsWithSameId() {
-        Epic epic = new Epic("Test", "desc", NEW, 1);
-        epic.addSubTasksIds(2);
-        Epic epic2 = new Epic("Test", "desc", NEW, 1);
-        epic2.addSubTasksIds(2);
+        Epic epic = new Epic("test", "desc");
+        epic.addSubTasksIds(epic.getId());
+        Epic epic2 = new Epic("test", "desc");
+        epic2.addSubTasksIds(epic2.getId());
         Assertions.assertEquals(epic, epic2);
     }
 
     @Test
-    @DisplayName("Добавление субтасков")
-    public void testAddSubtaskToEpicWithSameId() {
-        Epic epic = new Epic("Test", "desc", NEW, 1);
+    @DisplayName("Добавление SubTask в Epic по ID")
+    public void testAddSubTaskToEpicWithSameId() {
+        Epic epic = new Epic("Test", "desc");
         epic.addSubTasksIds(epic.getId());
         Assertions.assertEquals(1, epic.getSubTasksIds().size());
     }
@@ -30,27 +30,25 @@ public class EpicTest {
     @DisplayName("Создание класса эпика")
     void epicCreation() {
         int id = 1;
-        String title = "Title Epic";
-        String description = "Description";
+        String title = "test";
+        String description = "desc";
         Status status = Status.NEW;
-
-        Epic epic = new Epic(title, description, status, id);
+        Epic epic = new Epic(title, description);
         epic.setId(id);
-
-        assertEquals(id, epic.getId(), "Id Epic должен соответствовать: " + id);
-        assertEquals(title, epic.getName(), "Название Epic должен соответствовать: " + title);
-        assertEquals(description, epic.getDescription(), "Описание Epic должен соответствовать: " + description);
-        assertEquals(status, epic.getStatus(), "Статус Epic должен соответствовать:" + status);
+        assertEquals(id, epic.getId());
+        assertEquals(title, epic.getName());
+        assertEquals(description, epic.getDescription());
+        assertEquals(status, epic.getStatus());
     }
 
     @Test
-    @DisplayName("Сравнение эпиков")
+    @DisplayName("Сравнение Epic")
     void epicCreationAndEquality() {
-        Epic epic1 = new Epic("Epic 1", "Description 1", Status.NEW, 0);
-        Epic epic2 = new Epic("Epic 1", "Description 1", Status.NEW,1);
-        epic1.setId(1);
-        epic2.setId(1);
-        assertEquals(epic1, epic2, "Epics должны быть равными, когда их дети равны.");
+        Epic epic1 = new Epic("test", "desc");
+        Epic epic2 = new Epic("test", "desc");
+        epic1.setId(epic1.getId());
+        epic2.setId(epic2.getId());
+        assertEquals(epic1, epic2);
     }
 
 
