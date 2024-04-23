@@ -98,12 +98,13 @@ public class InMemoryTaskManager implements TaskManager {
 
 
     @Override
-    public Epic createEpic(Epic epic) {
+    public Epic createEpic(Epic epic){
         int epicId = generateCounter();
-        epic.setId(epicId);
+        epic.setId( epicId);
         epicsMap.put(epic.getId(), epic);
         return epic;
     }
+
 
     @Override
     public SubTask createSubTask(SubTask subTask) {
@@ -155,9 +156,8 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-
     @Override
-    public List<SubTask> getSubTasksEpicsIds(int epicId) {
+    public List<SubTask> getSubtasksByEpic(int epicId) { // исправил название метода
         Epic epic = epicsMap.get(epicId);
         historyManager.add(epicsMap.get(epicId));
         if (epic != null) {
@@ -175,7 +175,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task get(int taskId) {
+    public Task getTaskById(int taskId) { // исправил название метода
         historyManager.add(tasksMap.get(taskId));
         return tasksMap.get(taskId);
     }

@@ -42,7 +42,7 @@ public class Main {
         }
 
         System.out.println("\nСписок подзадач для эпика 1:");
-        for (SubTask subTask : taskManager.getSubTasksEpicsIds(epic1.getId())) {
+        for (SubTask subTask : taskManager.getSubtasksByEpic(epic1.getId())) {
             System.out.println(subTask.getName());
         }
 
@@ -91,7 +91,7 @@ public class Main {
         }
 
         System.out.println("\nСписок подзадач для эпика 1 после удаления подзадачи 1:");
-        for (SubTask subtask : taskManager.getSubTasksEpicsIds(epic1.getId())) {
+        for (SubTask subtask : taskManager.getSubtasksByEpic(epic1.getId())) {
             System.out.println(subtask.getName());
             String emoji = "\uD83D\uDE04";
             System.out.println("Приехали" + emoji);

@@ -4,13 +4,17 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static model.EpicTest.taskManager;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
 class TaskTest {
     @Test
-    @DisplayName("Сравнение двух Task")
+    @DisplayName("Сравнение двух Task, без генерации ID")
     public void testTwoTasksWithSameId() {
         Task task = new Task("test", "desc", Status.NEW);
         Task task2 = new Task("test", "desc", Status.NEW);
-        Assertions.assertEquals(task, task2);
+        assertEquals(task, task2);
     }
 
     @Test
@@ -20,7 +24,7 @@ class TaskTest {
         epic.addSubTasksIds(epic.getId());
         Epic epic2 = new Epic("Test", "desc");
         epic2.addSubTasksIds(epic2.getId());
-        Assertions.assertEquals(epic, epic2);
+        assertEquals(epic, epic2);
     }
 
     @Test
@@ -28,6 +32,27 @@ class TaskTest {
     public void testTwoSubTasksWithSameId() {
         SubTask subTask = new SubTask("test", "desc", Status.NEW, 2, 1);
         SubTask subTask2 = new SubTask("test", "desc", Status.NEW, 2, 1);
-        Assertions.assertEquals(subTask, subTask2);
+       assertEquals(subTask, subTask2);
     }
+    @Test
+    @DisplayName("Сравннение Task по ID")
+    void taskCantBeTaskAndСheckWithSameId() {
+        Task task = new Task("test", "desc",Status.NEW,0);
+        Task task1 = new Task("test", "desc",Status.NEW,1);
+        taskManager.createTask(task);
+        taskManager.createTask(task1);
+        assertEquals(taskManager.getTasksList().size(),2);
+        assertNotEquals(task, task1);
+    }
+    @Test
+    @DisplayName("задачи с заданным id и сгенерированным id не конфликтуют внутри менеджера")
+    void tasksWithTheSpecifiedIdAndTheGeneratedIdDoNotConflict() {
+        Task task = new Task("test", "desc",Status.NEW,0);
+        Task task1 = new Task("test", "desc");
+        taskManager.createTask(task);
+        taskManager.createTask(task1);
+        assertEquals(taskManager.getTasksList().size(),2);
+        assertNotEquals(task, task1);
+    }
+
 }

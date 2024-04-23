@@ -37,13 +37,14 @@ public interface TaskManager {
 
     void updateSubTask(SubTask subTask);
 
-    List<SubTask> getSubTasksEpicsIds(int epicId);
+    List<SubTask>getSubtasksByEpic(int epicId);
 
-    Task get(int id);
+    Task getTaskById(int id);
 
     Epic getEpicById(int id);
 
     SubTask getSubTaskById(int subTaskId);
 
     List<Task> getHistory();
+    public void updateSubTasks(SubTask subTask, int id);
 }
