@@ -1,6 +1,6 @@
 package model;
 
-import org.junit.jupiter.api.Assertions;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import service.Managers;
@@ -18,9 +18,9 @@ public class EpicTest {
     public void testTwoEpicsWithSameId() {
         Epic epic = new Epic("test", "desc");
         epic.addSubTasksIds(epic.getId());
-        Epic epic2 = new Epic("test", "desc");
-        epic2.addSubTasksIds(epic2.getId());
-        Assertions.assertEquals(epic, epic2);
+        Epic epic1 = new Epic("test", "desc");
+        epic1.addSubTasksIds(epic1.getId());
+        assertEquals(epic, epic1);
     }
 
     @Test
@@ -28,7 +28,7 @@ public class EpicTest {
     public void testAddSubTaskToEpicWithSameId() {
         Epic epic = new Epic("Test", "desc");
         epic.addSubTasksIds(epic.getId());
-        Assertions.assertEquals(1, epic.getSubTasksIds().size());
+        assertEquals(1, epic.getSubTasksIds().size());
     }
 
 
@@ -50,34 +50,22 @@ public class EpicTest {
     @Test
     @DisplayName("Сравнение Epic")
     void epicCreationAndEquality() {
+        Epic epic = new Epic("test", "desc");
         Epic epic1 = new Epic("test", "desc");
-        Epic epic2 = new Epic("test", "desc");
-        epic1.setId(epic1.getId());
-        epic2.setId(epic2.getId());
-        assertEquals(epic1, epic2);
+        epic.setId(epic.getId());
+        epic.setId(epic.getId());
+        assertEquals(epic, epic1);
     }
-
     @Test
-    @DisplayName("задачи с заданным id и сгенерированным id не конфликтуют внутри менеджера")
-    void epicCantBeEpicAndСheckWithSameId() {
-        Epic epic1 = new Epic("test", "desc");
+    @DisplayName("Epic заданным id и сгенерированным id не конфликтуют внутри менеджера")
+    void epicWithTheSpecifiedIdAndTheGeneratedIdDoNotConflict() {
+        Epic epic1 = new Epic("test", "desc",0);
         Epic epic2 = new Epic("test", "desc");
         taskManager.createEpic(epic1);
         taskManager.createEpic(epic2);
         assertEquals(2, taskManager.getEpicList().size());
         assertNotEquals(epic1, epic2);
 
-    }
-
-    @Test
-    @DisplayName("задачи с заданным id и сгенерированным id не конфликтуют внутри менеджера")
-    void tasksWithTheSpecifiedIdAndTheGeneratedIdDoNotConflict() {
-        Epic epic1 = new Epic("test", "desc", 0);
-        Epic epic2 = new Epic("test", "desc");
-        taskManager.createEpic(epic1);
-        taskManager.createEpic(epic2);
-        assertEquals(2, taskManager.getEpicList().size());
-        assertNotEquals(epic1, epic2);
     }
 
 }

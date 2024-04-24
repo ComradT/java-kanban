@@ -13,8 +13,8 @@ class TaskTest {
     @DisplayName("Сравнение двух Task, без генерации ID")
     public void testTwoTasksWithSameId() {
         Task task = new Task("test", "desc", Status.NEW);
-        Task task2 = new Task("test", "desc", Status.NEW);
-        assertEquals(task, task2);
+        Task task1 = new Task("test", "desc", Status.NEW);
+        assertEquals(task, task1);
     }
 
     @Test
@@ -22,9 +22,9 @@ class TaskTest {
     public void testTwoEpicsWithSameId() {
         Epic epic = new Epic("Test", "desc");
         epic.addSubTasksIds(epic.getId());
-        Epic epic2 = new Epic("Test", "desc");
-        epic2.addSubTasksIds(epic2.getId());
-        assertEquals(epic, epic2);
+        Epic epic1 = new Epic("Test", "desc");
+        epic1.addSubTasksIds(epic1.getId());
+        assertEquals(epic, epic1);
     }
 
     @Test
@@ -35,18 +35,8 @@ class TaskTest {
        assertEquals(subTask, subTask2);
     }
     @Test
-    @DisplayName("Сравннение Task по ID")
-    void taskCantBeTaskAndСheckWithSameId() {
-        Task task = new Task("test", "desc",Status.NEW,0);
-        Task task1 = new Task("test", "desc",Status.NEW,1);
-        taskManager.createTask(task);
-        taskManager.createTask(task1);
-        assertEquals(taskManager.getTasksList().size(),2);
-        assertNotEquals(task, task1);
-    }
-    @Test
     @DisplayName("задачи с заданным id и сгенерированным id не конфликтуют внутри менеджера")
-    void tasksWithTheSpecifiedIdAndTheGeneratedIdDoNotConflict() {
+    void testTasksWithTheSpecifiedIdAndTheGeneratedIdDoNotConflict() {
         Task task = new Task("test", "desc",Status.NEW,0);
         Task task1 = new Task("test", "desc");
         taskManager.createTask(task);
