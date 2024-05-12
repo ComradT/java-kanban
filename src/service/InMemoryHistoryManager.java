@@ -77,7 +77,6 @@ public class InMemoryHistoryManager implements HistoryManager {
         return historyList;
     }
 
-
     private void linkLast(Task task) {
         Node oldLast = last;
         Node newNode = new Node(task);
