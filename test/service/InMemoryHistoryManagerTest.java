@@ -4,7 +4,6 @@ import model.Epic;
 import model.Status;
 import model.SubTask;
 import model.Task;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,31 +14,147 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 class InMemoryHistoryManagerTest {
-    private InMemoryHistoryManager historyManager;
-    List<Task> history;
 
+    private HistoryManager historyManager;
 
     @BeforeEach
-    public void beforeEach() {
+    void setUp() {
         historyManager = new InMemoryHistoryManager();
-        history = historyManager.getHistory();
     }
 
-    @Test
-    @DisplayName("проверка добавления Task в HistoryManager")
-    void testAddShouldAddNotNullTaskToHistory() {
+    private Task createTask(int id) {
         Task task = new Task("test", "desc", Status.NEW);
-        Task task1 = new Task("test", "desc", Status.NEW);
-        historyManager.add(task);
-        historyManager.add(task1);
-        historyManager.add(task);
-        Assertions.assertEquals(historyManager.getHistory().size(), 3);
-        Assertions.assertEquals(history.get(0), history.get(2));
-        Assertions.assertNotNull(historyManager.getHistory().size());
+        task.setId(id);
+        return task;
+    }
+
+
+    @Test
+    @DisplayName("тест работы метода создание Task")
+    void testCreateTaskWhenHistoryManagerThenReturnSize() {
+        historyManager.add(createTask(1));
+        int actualSize = historyManager.getHistory().size();
+        assertEquals(1, actualSize);
     }
 
     @Test
-    @DisplayName("задачи, добавляемые в HistoryManager, сохраняют предыдущую версию задачи и её данных")
+    @DisplayName("тест удаления первого Task")
+    void testRemoveFirstTask() {
+        Task task = createTask(1);
+        historyManager.add(task);
+        Task task1 = createTask(2);
+        historyManager.add(task1);
+        Task task2 = createTask(3);
+        historyManager.add(task2);
+        historyManager.remove(1);
+        assertEquals(historyManager.getHistory(), List.of(task1, task2));
+    }
+
+
+    @Test
+    @DisplayName("тест удаления последнего Task")
+    void testRemoveLastTask() {
+        Task task = createTask(1);
+        historyManager.add(task);
+        Task task1 = createTask(2);
+        historyManager.add(task1);
+        Task task2 = createTask(3);
+        historyManager.add(task2);
+        historyManager.remove(3);
+        assertEquals(historyManager.getHistory(), List.of(task, task1));
+    }
+
+
+    @Test
+    @DisplayName("тест удаления среднего Task")
+    void testRemoveMiddleTask() {
+        Task task = createTask(1);
+        historyManager.add(task);
+        Task task1 = createTask(2);
+        historyManager.add(task1);
+        Task task2 = createTask(3);
+        historyManager.add(task2);
+        historyManager.remove(2);
+        assertEquals(historyManager.getHistory(), List.of(task, task2));
+    }
+
+
+    @Test
+    @DisplayName("тест невозможности добавить дубль Task")
+    void testNotAddDoubleTaskInHistoryManager() {
+        Task task = createTask(1);
+        historyManager.add(task);
+        historyManager.add(task);
+        int actualSize = historyManager.getHistory().size();
+        assertEquals(1, actualSize);
+    }
+
+    @Test
+    @DisplayName("тест записи и удаления всего списка HistoryManager")
+    void testRemoveWhenRecordExistThenHistoryIsEmpty() {
+        Task task = createTask(1);
+        historyManager.add(task);
+        historyManager.add(createTask(2));
+        historyManager.add(createTask(3));
+        historyManager.remove(1);
+        historyManager.remove(2);
+        historyManager.remove(3);
+        List<Task> historyIsEmpty = historyManager.getHistory();
+        List<Task> nullHistory = List.of();
+        assertEquals(nullHistory, historyIsEmpty);
+    }
+
+    @Test
+    @DisplayName("тест добавления и записи Task в начало HistoryManager")
+    void testAddWhenRecordIsFirst() {
+        Task task1 = createTask(1);
+        historyManager.add(task1);
+        historyManager.add(createTask(2));
+        historyManager.add(createTask(3));
+        int actualFirstId = historyManager.getHistory().getFirst().getId();
+        assertEquals(1, actualFirstId);
+    }
+
+    @Test
+    @DisplayName("тест добавления и записи Task в конец HistoryManager")
+    void testAddWhenRecordIsLast() {
+        historyManager.add(createTask(1));
+        historyManager.add(createTask(2));
+        Task task3 = createTask(3);
+        historyManager.add(task3);
+
+        int actualLastId = historyManager.getHistory().getLast().getId();
+
+        assertEquals(3, actualLastId);
+    }
+
+    @Test
+    @DisplayName("тест добавления и записи Task в середину HistoryManager")
+    void testAddWhenRecordInTheMiddle() {
+        historyManager.add(createTask(1));
+        Task task2 = createTask(2);
+        historyManager.add(task2);
+        historyManager.add(createTask(3));
+        int actualMiddleId = historyManager.getHistory().getFirst().getId(2);
+        assertEquals(2, actualMiddleId);
+    }
+
+
+    @Test
+    @DisplayName("тест добавления и записи трех Task в HistoryManager")
+    void testGetHistoryWhen3RecordsExistThenReturnHistoryList() {
+        Task task1 = createTask(1);
+        historyManager.add(task1);
+        Task task2 = createTask(2);
+        historyManager.add(task2);
+        Task task3 = createTask(3);
+        historyManager.add(task3);
+        List<Task> expectedHistory = List.of(task1, task2, task3);
+        assertEquals(expectedHistory, historyManager.getHistory());
+    }
+
+    @Test
+    @DisplayName("тест задачи, добавляемые в HistoryManager, сохраняют предыдущую версию задачи и её данных")
     void testTaskAddedRetainThePreviousVersionInMemoryHistoryManager() {
         Task task = new Task("test", "desc", Status.NEW, 1);
         Epic epic = new Epic("test", "desc", Status.NEW, 2);
@@ -59,16 +174,6 @@ class InMemoryHistoryManagerTest {
         assertEquals("test", subTask.getName());
         assertEquals("desc", subTask.getDescription());
         assertEquals(Status.NEW, subTask.getStatus());
-      }
-
-    @Test
-    @DisplayName("проверка добавления не больше 10 задач в inMemoryHistoryManager")
-    void testAddHistoryShouldNotBeLongerThan10() {
-        int i = 0;
-        while (i < 11) {
-            historyManager.add(new Task("test", "desc", Status.NEW));
-            i++;
-        }
-        Assertions.assertEquals( historyManager.getHistory().size(),10);
     }
+
 }
