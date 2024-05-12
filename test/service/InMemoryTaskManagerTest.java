@@ -223,8 +223,9 @@ class InMemoryTaskManagerTest {
         final List<Task> tasks = taskManager.getTasksList();
         Assertions.assertNotNull(tasks);
         Assertions.assertEquals(1, tasks.size());
-        Assertions.assertNotEquals(task, tasks.get(0));
+        Assertions.assertNotEquals(task, tasks.getFirst());
     }
+
     @Test
     @DisplayName("Epic нельзя добавить в самого себя в виде подзадачи")
     void testShouldCreateIdAndSaveEpicById() {
@@ -236,22 +237,23 @@ class InMemoryTaskManagerTest {
         final List<Epic> epics = taskManager.getEpicList();
         Assertions.assertNotNull(epics);
         Assertions.assertEquals(1, epics.size());
-        Assertions.assertNotEquals(epic, epics.get(0));
+        Assertions.assertNotEquals(epic, epics.getFirst());
     }
+
     @Test
     @DisplayName("SubTask нельзя сделать своим же эпиком")
     void testShouldCreateIdAndSaveSubTaskById() {
-        SubTask subTask = new SubTask("subTask", "desc", Status.NEW,1);
+        SubTask subTask = new SubTask("subTask", "desc", Status.NEW, 1);
         Epic epic = new Epic("epic", "desc");
         final int subTaskId = taskManager.createSubTask("task", "desc", epic);
         final int epicId = taskManager.createEpic("task", "desc");
-        final int savedSubTask = taskManager.createEpic("subTask","desc");
+        final int savedSubTask = taskManager.createEpic("subTask", "desc");
         Assertions.assertNotEquals(subTaskId, savedSubTask);
         Assertions.assertNotEquals(epicId, savedSubTask);
         final List<SubTask> subTasks = taskManager.getSubtaskList();
         Assertions.assertNotNull(subTasks);
         Assertions.assertEquals(1, subTasks.size());
-        Assertions.assertEquals(subTask, subTasks.get(0));
+        Assertions.assertEquals(subTask, subTasks.getFirst());
     }
 
 }
