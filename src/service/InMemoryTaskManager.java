@@ -95,7 +95,6 @@ public class InMemoryTaskManager implements TaskManager {
         tasksMap.put(task.getId(), task);
         return task;
     }
-
     @Override
     public int createTask(String name, String description) {
         int taskId = generateCounter();
@@ -105,13 +104,12 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Epic createEpic(Epic epic) {
+    public Epic createEpic(Epic epic){
         int epicId = generateCounter();
-        epic.setId(epicId);
+        epic.setId( epicId);
         epicsMap.put(epic.getId(), epic);
         return epic;
     }
-
     @Override
     public int createEpic(String name, String description) {
         int epicId = generateCounter();
@@ -136,7 +134,6 @@ public class InMemoryTaskManager implements TaskManager {
         }
         return subTask;
     }
-
     @Override
     public int createSubTask(String name, String description, Epic epic) {
         int subTaskId = generateCounter();
@@ -144,7 +141,6 @@ public class InMemoryTaskManager implements TaskManager {
         subTasksMap.put(subTaskId, subTask);
         return subTaskId;
     }
-
     @Override
     public void updateTask(Task task) {
         int taskId = task.getId();

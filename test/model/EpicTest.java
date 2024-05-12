@@ -56,11 +56,10 @@ public class EpicTest {
         epic.setId(epic.getId());
         assertEquals(epic, epic1);
     }
-
     @Test
     @DisplayName("Epic заданным id и сгенерированным id не конфликтуют внутри менеджера")
     void epicWithTheSpecifiedIdAndTheGeneratedIdDoNotConflict() {
-        Epic epic1 = new Epic("test", "desc", 0);
+        Epic epic1 = new Epic("test", "desc",0);
         Epic epic2 = new Epic("test", "desc");
         taskManager.createEpic(epic1);
         taskManager.createEpic(epic2);

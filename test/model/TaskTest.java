@@ -1,6 +1,6 @@
 package model;
 
-
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -32,17 +32,16 @@ class TaskTest {
     public void testTwoSubTasksWithSameId() {
         SubTask subTask = new SubTask("test", "desc", Status.NEW, 2, 1);
         SubTask subTask2 = new SubTask("test", "desc", Status.NEW, 2, 1);
-        assertEquals(subTask, subTask2);
+       assertEquals(subTask, subTask2);
     }
-
     @Test
     @DisplayName("задачи с заданным id и сгенерированным id не конфликтуют внутри менеджера")
     void testTasksWithTheSpecifiedIdAndTheGeneratedIdDoNotConflict() {
-        Task task = new Task("test", "desc", Status.NEW, 0);
+        Task task = new Task("test", "desc",Status.NEW,0);
         Task task1 = new Task("test", "desc");
         taskManager.createTask(task);
         taskManager.createTask(task1);
-        assertEquals(taskManager.getTasksList().size(), 2);
+        assertEquals(taskManager.getTasksList().size(),2);
         assertNotEquals(task, task1);
     }
 
