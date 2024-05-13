@@ -35,6 +35,7 @@ class InMemoryHistoryManagerTest {
         historyManager.add(task);
         Assertions.assertEquals(historyManager.getHistory().size(), 3);
         Assertions.assertEquals(history.get(0), history.get(2));
+        Assertions.assertNotNull(historyManager.getHistory().size());
     }
 
     @Test
