@@ -122,9 +122,7 @@ class InMemoryHistoryManagerTest {
         historyManager.add(createTask(2));
         Task task3 = createTask(3);
         historyManager.add(task3);
-
         int actualLastId = historyManager.getHistory().getLast().getId();
-
         assertEquals(3, actualLastId);
     }
 
