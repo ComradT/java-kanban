@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -16,6 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class InMemoryHistoryManagerTest {
 
     private HistoryManager historyManager;
+
 
     @BeforeEach
     void setUp() {
@@ -28,6 +30,12 @@ class InMemoryHistoryManagerTest {
         return task;
     }
 
+    private HistoryManager setUp(int id) {
+        Task task = new Task("test", "desc", Status.NEW);
+        task.setId(id);
+        historyManager.add(task);
+        return historyManager;
+    }
 
     @Test
     @DisplayName("тест работы метода создание Task")
@@ -40,42 +48,42 @@ class InMemoryHistoryManagerTest {
     @Test
     @DisplayName("тест удаления первого Task")
     void testRemoveFirstTask() {
-        Task task = createTask(1);
-        historyManager.add(task);
-        Task task1 = createTask(2);
-        historyManager.add(task1);
-        Task task2 = createTask(3);
-        historyManager.add(task2);
+        setUp(1);
+        setUp(2);
+        setUp(3);
         historyManager.remove(1);
-        assertEquals(historyManager.getHistory(), List.of(task1, task2));
+        int actualSize = historyManager.getHistory().size();
+        List<Task> allTasks = List.copyOf(setUp(2).getHistory());
+        assertEquals(2, actualSize);
+        assertEquals(historyManager.getHistory(), allTasks);
     }
 
 
     @Test
     @DisplayName("тест удаления последнего Task")
     void testRemoveLastTask() {
-        Task task = createTask(1);
-        historyManager.add(task);
-        Task task1 = createTask(2);
-        historyManager.add(task1);
-        Task task2 = createTask(3);
-        historyManager.add(task2);
+        setUp(1);
+        setUp(2);
+        setUp(3);
         historyManager.remove(3);
-        assertEquals(historyManager.getHistory(), List.of(task, task1));
+        int actualSize = historyManager.getHistory().size();
+        List<Task> allTasks = List.copyOf(setUp(1).getHistory());
+        assertEquals(2, actualSize);
+        assertEquals(historyManager.getHistory(), allTasks);
     }
 
 
     @Test
     @DisplayName("тест удаления среднего Task")
     void testRemoveMiddleTask() {
-        Task task = createTask(1);
-        historyManager.add(task);
-        Task task1 = createTask(2);
-        historyManager.add(task1);
-        Task task2 = createTask(3);
-        historyManager.add(task2);
+        setUp(1);
+        setUp(2);
+        setUp(3);
         historyManager.remove(2);
-        assertEquals(historyManager.getHistory(), List.of(task, task2));
+        int actualSize = historyManager.getHistory().size();
+        List<Task> allTasks = List.copyOf(setUp(1).getHistory());
+        assertEquals(2, actualSize);
+        assertEquals(historyManager.getHistory(), allTasks);
     }
 
 
@@ -92,15 +100,14 @@ class InMemoryHistoryManagerTest {
     @Test
     @DisplayName("тест записи и удаления всего списка HistoryManager")
     void testRemoveWhenRecordExistThenHistoryIsEmpty() {
-        Task task = createTask(1);
-        historyManager.add(task);
-        historyManager.add(createTask(2));
-        historyManager.add(createTask(3));
+        setUp(1);
+        setUp(2);
+        setUp(3);
         historyManager.remove(1);
         historyManager.remove(2);
         historyManager.remove(3);
         List<Task> historyIsEmpty = historyManager.getHistory();
-        List<Task> nullHistory = List.of();
+        List<Task> nullHistory = new ArrayList<>();
         assertEquals(nullHistory, historyIsEmpty);
     }
 
@@ -155,23 +162,24 @@ class InMemoryHistoryManagerTest {
     @DisplayName("тест задачи, добавляемые в HistoryManager, сохраняют предыдущую версию задачи и её данных")
     void testTaskAddedRetainThePreviousVersionInMemoryHistoryManager() {
         Task task = new Task("test", "desc", Status.NEW, 1);
-        Epic epic = new Epic("test", "desc", Status.NEW, 2);
-        SubTask subTask = new SubTask("test", "desc", Status.NEW, 2, 2);
+        Epic epic = new Epic("test1", "desc1", Status.IN_PROGRESS, 2);
+        SubTask subTask = new SubTask("test2", "desc3", Status.DONE, 3, 3);
         historyManager.add(task);
         historyManager.add(epic);
-        assertEquals(1, task.getId(), 1);
-        assertEquals("test", task.getName());
-        assertEquals("desc", task.getDescription());
-        assertEquals(Status.NEW, task.getStatus());
-        assertEquals(2, epic.getId());
-        assertEquals("test", epic.getName());
-        assertEquals("desc", epic.getDescription());
-        assertEquals(Status.NEW, epic.getStatus());
-        assertEquals(2, subTask.getEpicId());
-        assertEquals(2, subTask.getId());
-        assertEquals("test", subTask.getName());
-        assertEquals("desc", subTask.getDescription());
-        assertEquals(Status.NEW, subTask.getStatus());
+        historyManager.add(subTask);
+        assertEquals(1, task.getId(), "ID Task равны");
+        assertEquals("test", task.getName(), "Задачи Task равны");
+        assertEquals("desc", task.getDescription(), "Подзадачи Task равны");
+        assertEquals(Status.NEW, task.getStatus(), "Статусы Task равны");
+        assertEquals(2, epic.getId(), "ID Epic равны");
+        assertEquals("test1", epic.getName(), "Задачи Epic равны");
+        assertEquals("desc1", epic.getDescription(), "Подзадачи Epic равны");
+        assertEquals(Status.IN_PROGRESS, epic.getStatus(), "Статусы Epic равны");
+        assertEquals(3, subTask.getEpicId(), "ID Epic save в SubTask");
+        assertEquals(3, subTask.getId(), "ID SubTask равны");
+        assertEquals("test2", subTask.getName(), "Задачи Epic save SubTask");
+        assertEquals("desc3", subTask.getDescription(), "Подзадачи SubTask равны");
+        assertEquals(Status.DONE, subTask.getStatus(), "Статусы SubTask равны");
+        assertEquals(historyManager.getHistory(), List.of(task, epic, subTask), "Задачи добавляемые в HistoryManager равны задачам в списке");
     }
-
 }
