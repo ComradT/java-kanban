@@ -95,10 +95,12 @@ public class Task {
                 "id=" + id +
                 '}';
     }
+
     public TaskType getTaskType() {
         return taskType;
     }
-       public void setType(TaskType type) {
+
+    public void setType(TaskType type) {
         this.taskType = type;
     }
 
