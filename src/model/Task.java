@@ -1,5 +1,7 @@
 package model;
 
+import enums.Status;
+
 import java.util.Objects;
 
 public class Task {

@@ -1,7 +1,7 @@
 package service;
 
 import model.Epic;
-import model.Status;
+import enums.Status;
 import model.SubTask;
 import model.Task;
 import org.junit.jupiter.api.Assertions;

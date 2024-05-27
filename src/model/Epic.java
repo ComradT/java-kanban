@@ -1,6 +1,8 @@
 package model;
 
 
+import enums.Status;
+
 import java.util.ArrayList;
 import java.util.List;
 

@@ -1,5 +1,5 @@
 import model.Epic;
-import model.Status;
+import enums.Status;
 import model.Task;
 import model.SubTask;
 import service.Managers;
