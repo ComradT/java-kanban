@@ -1,6 +1,8 @@
 package service;
 
 
+import interfaces.HistoryManager;
+import interfaces.TaskManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

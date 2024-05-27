@@ -2,6 +2,7 @@ package model;
 
 
 import enums.Status;
+import enums.TaskType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,17 +15,20 @@ public class Epic extends Task {
     public Epic(String name, String description, Status status, int id) {
         super(name, description, status, id);
         this.subTasksIds = new ArrayList<>();
+        this.taskType = TaskType.EPIC;
     }
 
     public Epic(String name, String description) {
         super(name, description, Status.NEW);
         this.subTasksIds = new ArrayList<>();
+        this.taskType = TaskType.EPIC;
     }
 
     public Epic(String name, String description, int id) {
         super(name, description);
         setId(id);
         this.subTasksIds = new ArrayList<>();
+        this.taskType = TaskType.EPIC;
     }
 
     public void addSubTasksIds(int subTaskId) {
@@ -52,6 +56,17 @@ public class Epic extends Task {
                 '}';
     }
 
+    public void removeSubTask(int id) {
+        for (int i = 0; i < subTasksIds.size(); i++)
+            if (id == subTasksIds.get(i)) {
+                subTasksIds.remove(i);
+                break;
+            }
+    }
+
+    public void removeAllSubtasks() {
+        subTasksIds.clear();
+    }
 }
 
 
