@@ -9,35 +9,18 @@ import model.Task;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
+    File CREATE_FILE = new File("resources/file.csv");
 
-    Path dir;
-    Path file;
+    private final File file;
 
-    public FileBackedTaskManager() {
-        super();
-        dir = Paths.get("resources");
-        file = Paths.get("resources/file.csv");
-        if (!dir.toFile().isDirectory()) {
-            try {
-                Files.createDirectory(dir);
-            } catch (IOException e) {
-                throw new ManagerSaveException("Ошибка создания директории: " + e.getMessage());
-            }
-        }
-        File file = this.file.toFile();
-        if (!this.file.toFile().isFile()) {
-            try {
-                Files.createFile(this.file);
-            } catch (IOException e) {
-                throw new ManagerSaveException("Ошибка создания файла: " + e.getMessage());
-            }
-        }
-        loadFromFile(file);
+    public FileBackedTaskManager(File file) {
+        this.file = CREATE_FILE;
+
     }
+
 
     @Override
     public void removeAllTasks() {
@@ -138,21 +121,22 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private void save() {
         try {
-            Files.deleteIfExists(file);
-            Files.createFile(file);
-            try (Writer writer = new FileWriter(file.toFile())) {
+            Files.deleteIfExists(file.toPath());
+            Files.createFile(file.toPath());
+            try (Writer writer = new FileWriter(file)) {
                 writer.write("id,type,name,status,description,epic\n");
                 for (Task task : tasksMap.values()) writer.write(task.toString() + "\n");
                 for (Epic epic : epicsMap.values()) writer.write(epic.toString() + "\n");
                 for (SubTask subtask : subTasksMap.values()) writer.write(subtask.toString() + "\n");
-                //for (Task history : historyManager.getHistory()) writer.write(history.getId() + ",");
             }
         } catch (IOException e) {
             throw new ManagerSaveException(e.getMessage());
         }
     }
 
-    public void loadFromFile(File file) throws IllegalStateException {
+
+    static FileBackedTaskManager loadFromFile(File file) throws IllegalStateException {
+        FileBackedTaskManager fB = new FileBackedTaskManager(file);
         try {
             Reader fileReader = new FileReader(file);
             BufferedReader br = new BufferedReader(fileReader);
@@ -165,45 +149,45 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                         && !currentLine.contains(TaskType.SUBTASK.toString())) {
                     String[] ids = currentLine.split(",");
                     for (String id : ids) {
-                        //Task task;
+                        Task task;
                         int taskId = Integer.parseInt(id);
-                        if (tasksMap.containsKey(taskId)) {
-                            tasksMap.get(taskId);
-                        } else if (epicsMap.containsKey(taskId)) {
-                           epicsMap.get(taskId);
-                        } else if (subTasksMap.containsKey(taskId)) {
-                            subTasksMap.get(taskId);
+                        if (fB.tasksMap.containsKey(taskId)) {
+                            task = fB.tasksMap.get(taskId);
+                        } else if (fB.epicsMap.containsKey(taskId)) {
+                            task = fB.epicsMap.get(taskId);
+                        } else if (fB.subTasksMap.containsKey(taskId)) {
+                            task = fB.subTasksMap.get(taskId);
                         } else {
                             System.out.println("Нет такого таска");
                             break;
                         }
-                        //historyManager.add(task);
+                        fB.historyManager.add(task);
                     }
                 } else {
                     Task task = fromString(currentLine);
                     int taskId = task.getId();
                     switch (task.getTaskType()) {
                         case TASK:
-                            tasksMap.put(taskId, task);
+                            fB.tasksMap.put(taskId, task);
                             break;
                         case EPIC:
-                            epicsMap.put(taskId, (Epic) task);
+                            fB.epicsMap.put(taskId, (Epic) task);
                             break;
                         case SUBTASK:
                             SubTask subtask = (SubTask) task;
                             int epicId = subtask.getEpicId();
-                            int epic = epicsMap.get(epicId).getId();
+                            int epic = fB.epicsMap.get(epicId).getId();
                             if (epic == 0) {
                                 System.out.println("Нет такого tasks.Epic");
                                 break;
                             }
-                            subTasksMap.put(taskId, subtask);
-                            super.updateStatus(epic);
+                            fB.subTasksMap.put(taskId, subtask);
+                            fB.updateStatus(epic);
                             break;
                         default:
                             throw new IllegalStateException("Неверное значение задачи: " + task.getTaskType());
                     }
-                    super.counter = ++taskId;
+                    if (fB.counter <= taskId) fB.counter = ++taskId;
                 }
                 currentLine = nextLine;
                 nextLine = br.readLine();
@@ -212,6 +196,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка сохранения файла: " + e.getMessage());
         }
+        return fB;
     }
 
     private static Task fromString(String value) {
