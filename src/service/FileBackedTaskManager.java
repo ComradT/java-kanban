@@ -12,12 +12,12 @@ import java.nio.file.Files;
 
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
-    File CreateFile = new File("resources/file.csv");
+    File createFile = new File("resources/file.csv");
 
     private final File file;
 
     public FileBackedTaskManager(File file) {
-        this.file = CreateFile;
+        this.file = createFile;
 
     }
 
