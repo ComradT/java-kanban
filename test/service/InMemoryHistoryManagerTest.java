@@ -1,7 +1,8 @@
 package service;
 
+import interfaces.HistoryManager;
 import model.Epic;
-import model.Status;
+import enums.Status;
 import model.SubTask;
 import model.Task;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +21,7 @@ class InMemoryHistoryManagerTest {
 
 
     @BeforeEach
-    void setUp() {
+    void createHistory() {
         historyManager = new InMemoryHistoryManager();
     }
 
@@ -30,7 +31,7 @@ class InMemoryHistoryManagerTest {
         return task;
     }
 
-    private HistoryManager setUp(int id) {
+    private HistoryManager createHistory(int id) {
         Task task = new Task("test", "desc", Status.NEW);
         task.setId(id);
         historyManager.add(task);
@@ -48,12 +49,12 @@ class InMemoryHistoryManagerTest {
     @Test
     @DisplayName("тест удаления первого Task")
     void testRemoveFirstTask() {
-        setUp(1);
-        setUp(2);
-        setUp(3);
+        createHistory(1);
+        createHistory(2);
+        createHistory(3);
         historyManager.remove(1);
         int actualSize = historyManager.getHistory().size();
-        List<Task> allTasks = List.copyOf(setUp(2).getHistory());
+        List<Task> allTasks = List.copyOf(createHistory(2).getHistory());
         assertEquals(2, actualSize);
         assertEquals(historyManager.getHistory(), allTasks);
     }
@@ -62,12 +63,12 @@ class InMemoryHistoryManagerTest {
     @Test
     @DisplayName("тест удаления последнего Task")
     void testRemoveLastTask() {
-        setUp(1);
-        setUp(2);
-        setUp(3);
+        createHistory(1);
+        createHistory(2);
+        createHistory(3);
         historyManager.remove(3);
         int actualSize = historyManager.getHistory().size();
-        List<Task> allTasks = List.copyOf(setUp(1).getHistory());
+        List<Task> allTasks = List.copyOf(createHistory(1).getHistory());
         assertEquals(2, actualSize);
         assertEquals(historyManager.getHistory(), allTasks);
     }
@@ -76,12 +77,12 @@ class InMemoryHistoryManagerTest {
     @Test
     @DisplayName("тест удаления среднего Task")
     void testRemoveMiddleTask() {
-        setUp(1);
-        setUp(2);
-        setUp(3);
+        createHistory(1);
+        createHistory(2);
+        createHistory(3);
         historyManager.remove(2);
         int actualSize = historyManager.getHistory().size();
-        List<Task> allTasks = List.copyOf(setUp(1).getHistory());
+        List<Task> allTasks = List.copyOf(createHistory(1).getHistory());
         assertEquals(2, actualSize);
         assertEquals(historyManager.getHistory(), allTasks);
     }
@@ -100,9 +101,9 @@ class InMemoryHistoryManagerTest {
     @Test
     @DisplayName("тест записи и удаления всего списка HistoryManager")
     void testRemoveWhenRecordExistThenHistoryIsEmpty() {
-        setUp(1);
-        setUp(2);
-        setUp(3);
+        createHistory(1);
+        createHistory(2);
+        createHistory(3);
         historyManager.remove(1);
         historyManager.remove(2);
         historyManager.remove(3);
