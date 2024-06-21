@@ -2,11 +2,11 @@ package service;
 
 
 import enums.Status;
-import interfaces.TaskManager;
 import model.Epic;
 import model.SubTask;
 import model.Task;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -20,31 +20,39 @@ import java.nio.file.Paths;
 import static service.Managers.getFileBackedTaskManager;
 
 
-public class FileBackedTaskManagerTest {
+public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
 
-    Path file = Paths.get("resources/file.csv");
-    private TaskManager taskManager;
+    private final Path file = Paths.get("resources/file.csv");
 
+
+    @BeforeEach
+    public void beforeEach() {
+        taskManager = new FileBackedTaskManager(file.toFile());
+    }
 
     @Test
     @DisplayName("тест создания файла")
-    public void testCreateEmptyFileTest() throws IOException {
-        Files.deleteIfExists(file);
+    public void testCreateEmptyFileTest() {
+        try {
+            Files.deleteIfExists(file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         Assertions.assertFalse(file.toFile().isFile());
-        taskManager = getFileBackedTaskManager(file.toFile());
+        taskManager = (FileBackedTaskManager) getFileBackedTaskManager(file.toFile());
         Assertions.assertNotNull(String.valueOf(file.toFile().isFile()));
     }
 
 
     @Test
     @DisplayName("тест работы создание Task")
-    public void testCreateTasksToFileTest() throws IOException {
+    public void testCreateTasksToFileTest() {
         try {
             Files.deleteIfExists(file);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        taskManager = getFileBackedTaskManager(file.toFile());
+        taskManager = (FileBackedTaskManager) getFileBackedTaskManager(file.toFile());
         Task task = new Task("Task", "TaskDesc", Status.NEW);
         task = taskManager.createTask(task);
         Epic epic = new Epic("Epic", "EpicDesc");
@@ -53,11 +61,30 @@ public class FileBackedTaskManagerTest {
         subtask = taskManager.createSubTask(subtask);
         taskManager.getTaskById(task.getId());
         taskManager.getSubTaskById(subtask.getId());
-        Reader fileReader = new FileReader(file.toFile());
+        Reader fileReader = null;
+        try {
+            fileReader = new FileReader(file.toFile());
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
         BufferedReader br = new BufferedReader(fileReader);
-        br.readLine();
-        while (br.ready()) {
-            String line = br.readLine();
+        try {
+            br.readLine();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        while (true) {
+            try {
+                if (!br.ready()) break;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            String line = null;
+            try {
+                line = br.readLine();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             Assertions.assertTrue((line.contains(String.valueOf(task.getId()))
                     && line.contains(task.getName()) && line.contains(task.getDescription()))
                     || (line.contains(String.valueOf(epic.getId()))
@@ -66,29 +93,44 @@ public class FileBackedTaskManagerTest {
                     && line.contains(subtask.getName()) && line.contains(subtask.getDescription()))
                     || (line.contains(task.getId() + "," + subtask.getId())));
         }
-        br.close();
+        try {
+            br.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
     @DisplayName("тест загрузки в файл")
-    public void testLoadFileTest() throws IOException {
-        Files.deleteIfExists(file);
-        Files.createFile(file);
+    public void testLoadFileTest() {
+        try {
+            Files.deleteIfExists(file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            Files.createFile(file);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         try (Writer writer = new FileWriter(file.toFile())) {
-            writer.write("id,type,name,status,description,epic\n");
-            writer.write("1,TASK,New Task,NEW,New Task Desc\n");
-            writer.write("2,EPIC,New Epic,NEW, New Epic Desc\n");
-            writer.write("3,SUBTASK,New Subtask,NEW,New Sub Desc,2\n");
+            writer.write("id,type,name,status,description,startTime,endTime,duration,epic\n");
+            writer.write("1,TASK,New Task,DONE,New Task Desc,null,null,0\n");
+            writer.write("2,EPIC,New Epic,NEW, New Epic Desc,null,null,0\n");
+            writer.write("3,SUBTASK,New Subtask,NEW,New sub desc,null,null,0,2\n");
+            writer.write("3,1");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
         taskManager = FileBackedTaskManager.loadFromFile(file.toFile());
         Task task = taskManager.getTaskById(1);
         Assertions.assertEquals(task.getId(), 1);
         Assertions.assertEquals(task.getName(), "New Task");
-        Assertions.assertEquals(task.getStatus(), Status.NEW);
+        Assertions.assertEquals(task.getStatus(), Status.DONE);
         Epic epic = taskManager.getEpicById(2);
         Assertions.assertEquals(epic.getId(), 2);
         Assertions.assertEquals(epic.getName(), "New Epic");
-        Assertions.assertEquals(epic.getStatus(), Status.IN_PROGRESS);
+        Assertions.assertEquals(epic.getStatus(), Status.NEW);
         SubTask subtask = taskManager.getSubTaskById(3);
         Assertions.assertEquals(subtask.getId(), 3);
         Assertions.assertEquals(subtask.getName(), "New Subtask");

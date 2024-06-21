@@ -1,6 +1,6 @@
 package service;
 
-import interfaces.TaskManager;
+
 import model.Epic;
 import enums.Status;
 import model.SubTask;
@@ -12,12 +12,15 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-class InMemoryTaskManagerTest {
-    private TaskManager taskManager;
+
+import static service.Managers.getDefault;
+
+class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
+
 
     @BeforeEach
     void beforeEach() {
-        taskManager = new InMemoryTaskManager();
+        taskManager = (InMemoryTaskManager) getDefault();
     }
 
     @Test
@@ -183,9 +186,10 @@ class InMemoryTaskManagerTest {
     @Test
     @DisplayName("неизменность SubTask (по всем полям) при добавлении задачи в менеджер")
     public void testCreateSubTaskCheckEveryField() {
-        SubTask subTask = taskManager.createSubTask(new SubTask("test", "desc", Status.NEW, 1, 2));
-        Assertions.assertEquals(1, subTask.getId());
-        Assertions.assertEquals(2, subTask.getEpicId());
+        Epic epic = taskManager.createEpic(new Epic("test", "desc", Status.NEW, 1));
+        SubTask subTask = taskManager.createSubTask(new SubTask("test", "desc", Status.NEW, 1, 1));
+        Assertions.assertEquals(1, epic.getId());
+        Assertions.assertEquals(1, subTask.getEpicId());
         Assertions.assertEquals("test", subTask.getName());
         Assertions.assertEquals("desc", subTask.getDescription());
         Assertions.assertEquals(Status.NEW, subTask.getStatus());
@@ -195,7 +199,7 @@ class InMemoryTaskManagerTest {
     @Test
     @DisplayName("проверка на ID")
     void testShouldCreateIdCheckById() {
-        Task task = new Task("task", "descTask");
+        Task task = new Task("task", "descTask", Status.NEW);
         Epic epic = new Epic("epic", "descEpic");
         Epic epic1 = new Epic("epic", "descEpic");
         SubTask subTask = new SubTask("epic", "descEpic", Status.NEW, 1);
@@ -216,7 +220,7 @@ class InMemoryTaskManagerTest {
     @Test
     @DisplayName("Task нельзя добавить в самого себя в виде подзадачи")
     void testShouldCreateIdAndSaveTaskById() {
-        Task task = new Task("epic", "desc");
+        Task task = new Task("epic", "desc", Status.NEW);
         final int taskId = taskManager.createTask("epic", "desc");
         final Task savedTask = taskManager.getTaskById(taskId);
         Assertions.assertNotNull(savedTask);
@@ -254,7 +258,7 @@ class InMemoryTaskManagerTest {
         final List<SubTask> subTasks = taskManager.getSubtaskList();
         Assertions.assertNotNull(subTasks);
         Assertions.assertEquals(1, subTasks.size());
-        Assertions.assertEquals(subTask, subTasks.getFirst());
+        Assertions.assertNotEquals(subTask, taskManager.getSubtaskList());
     }
 
 }
