@@ -17,7 +17,6 @@ import static service.Managers.getDefault;
 
 class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
 
-
     @BeforeEach
     void beforeEach() {
         taskManager = (InMemoryTaskManager) getDefault();
@@ -260,5 +259,4 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
         Assertions.assertEquals(1, subTasks.size());
         Assertions.assertNotEquals(subTask, taskManager.getSubtaskList());
     }
-
 }
