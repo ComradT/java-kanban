@@ -40,12 +40,12 @@ public class HttpTaskManagerTasksTest {
         taskManager.removeAllTasks();
         taskManager.removeAllSubtasks();
         taskManager.removeAllEpics();
-        taskServer.start();
+        HttpTaskServer.start();
     }
 
     @AfterEach
     public void shutDown() {
-        taskServer.stop();
+        HttpTaskServer.stop();
     }
 
     @Test
@@ -355,7 +355,7 @@ public class HttpTaskManagerTasksTest {
                     subTask.getId(), LocalDateTime.now(), 60, epic.getId());
 
             subTaskTmp = taskManager.getSubTaskById(subTask.getId());
-            assertEquals("newSub", subTaskTmp.getName(), "Некорректное имя задачи");
+            assertEquals("Sub", subTaskTmp.getName(), "Некорректное имя задачи");
             assertEquals("subdesc", subTaskTmp.getDescription(), "Некорректное описание");
 
             String subtaskJson = gson.toJson(newSubtask);
