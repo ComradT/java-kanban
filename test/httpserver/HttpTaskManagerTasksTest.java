@@ -174,22 +174,6 @@ public class HttpTaskManagerTasksTest {
         assertEquals(1, returnTask.getId(), "Некорректное время");
     }
 
- /*   @Test
-    public void testGetNullTask() throws IOException, InterruptedException {
-
-        // создаём HTTP-клиент и запрос
-        HttpResponse<String> response;
-        try (HttpClient client = HttpClient.newHttpClient()) {
-            URI url = URI.create("http://localhost:8080/tasks/1");
-            HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
-
-            // вызываем рест, отвечающий за создание задач
-            response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        }
-        // проверяем код ответа
-        assertEquals(404, response.statusCode());
-    }*/
-
     @Test
     public void testDeleteTask() throws IOException, InterruptedException {
         // создаём задачу
@@ -352,7 +336,7 @@ public class HttpTaskManagerTasksTest {
                 subtask.getId(), LocalDateTime.now(), 60, epic.getId());
 
         SubTask subtaskTmp = taskManager.getSubTaskById(subtask.getId());
-        assertEquals("Sub", subtaskTmp.getName(), "Некорректное имя задачи1");
+        assertEquals("Sub", subtaskTmp.getName(), "Некорректное имя задачи");
         assertEquals("subdesc", subtaskTmp.getDescription(), "Некорректное описание");
 
         String subtaskJson = gson.toJson(newSubtask);
@@ -363,9 +347,9 @@ public class HttpTaskManagerTasksTest {
         assertEquals(201, response.statusCode());
 
         // проверяем, что создалась одна задача с корректным именем
-        subtaskTmp = taskManager.getSubTaskById(subtask.getId());
+        subtaskTmp = taskManager.getSubTaskById(newSubtask.getId());
 
-        assertEquals("newSub", newSubtask.getName(), "Некорректное имя задачи2");
+        assertEquals("newSub", subtaskTmp.getName(), "Некорректное имя задачи");
         assertEquals("newSubdesc", subtaskTmp.getDescription(), "Некорректное описание");
         assertEquals(Status.DONE, subtaskTmp.getStatus(), "Некорректный статус");
     }
@@ -474,38 +458,6 @@ public class HttpTaskManagerTasksTest {
         assertEquals(subTask.getStatus(), returnSubTask.getStatus(), "Некорректный статус");
         assertEquals(subTask.getId(), returnSubTask.getId(), "Некорректный id");
     }
-
-   /* @Test
-    public void testGetNullEpic() throws IOException, InterruptedException {
-
-        // создаём HTTP-клиент и запрос
-        HttpResponse<String> response;
-        try (HttpClient client = HttpClient.newHttpClient()) {
-            URI url = URI.create("http://localhost:8080/epics/1");
-            HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
-
-            // вызываем рест, отвечающий за создание задач
-            response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        }
-        // проверяем код ответа
-        assertEquals(404, response.statusCode());
-    }*/
-
-/*    @Test
-    public void testGetNullSubtask() throws IOException, InterruptedException {
-
-        // создаём HTTP-клиент и запрос
-        HttpResponse<String> response;
-        try (HttpClient client = HttpClient.newHttpClient()) {
-            URI url = URI.create("http://localhost:8080/subtasks/1");
-            HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
-
-            // вызываем рест, отвечающий за создание задач
-            response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        }
-        // проверяем код ответа
-        assertEquals(404, response.statusCode());
-    }*/
 
     @Test
     public void testDeleteEpicAndSubTask() throws IOException, InterruptedException {
