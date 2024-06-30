@@ -9,6 +9,7 @@ import model.Task;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.time.LocalDateTime;
 
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
@@ -124,7 +125,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             Files.deleteIfExists(file.toPath());
             Files.createFile(file.toPath());
             try (Writer writer = new FileWriter(file)) {
-                writer.write("id,type,name,status,description,epic\n");
+                writer.write("id,type,name,status,description,startTime,endTime,duration,epic\n");
                 for (Task task : tasksMap.values()) writer.write(task.toString() + "\n");
                 for (Epic epic : epicsMap.values()) writer.write(epic.toString() + "\n");
                 for (SubTask subtask : subTasksMap.values()) writer.write(subtask.toString() + "\n");
@@ -144,9 +145,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             String currentLine = br.readLine();
             String nextLine = br.readLine();
             while (currentLine != null) {
-                if (nextLine == null && !currentLine.contains(TaskType.TASK.toString())
-                        && !currentLine.contains(TaskType.EPIC.toString())
-                        && !currentLine.contains(TaskType.SUBTASK.toString())) {
+                if (nextLine == null && !currentLine.contains(TaskType.TASK.toString()) && !currentLine.contains(TaskType.EPIC.toString()) && !currentLine.contains(TaskType.SUBTASK.toString())) {
                     String[] ids = currentLine.split(",");
                     for (String id : ids) {
                         Task task;
@@ -169,6 +168,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     switch (task.getTaskType()) {
                         case TASK:
                             fB.tasksMap.put(taskId, task);
+                            fB.addTaskToSortedTasks(task);
                             break;
                         case EPIC:
                             fB.epicsMap.put(taskId, (Epic) task);
@@ -176,13 +176,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                         case SUBTASK:
                             SubTask subtask = (SubTask) task;
                             int epicId = subtask.getEpicId();
-                            int epic = fB.epicsMap.get(epicId).getId();
-                            if (epic == 0) {
+                            Epic epic = fB.epicsMap.get(epicId);
+                            if (epic == null) {
                                 System.out.println("Нет такого tasks.Epic");
                                 break;
                             }
                             fB.subTasksMap.put(taskId, subtask);
-                            fB.updateStatus(epic);
+                            fB.addTaskToSortedTasks(subtask);
+                            epic.addSubTaskId(taskId);
+                            fB.updateEpicFields(epic);
                             break;
                         default:
                             throw new IllegalStateException("Неверное значение задачи: " + task.getTaskType());
@@ -199,6 +201,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return fB;
     }
 
+
     private static Task fromString(String value) {
         Task task = null;
         String[] split = value.split(",");
@@ -207,10 +210,17 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         String name = split[2];
         Status status = Status.valueOf(split[3]);
         String desc = split[4];
+        String startTimeStr = split[5];
+        LocalDateTime startTime = null;
+        if (!startTimeStr.equals("null")) startTime = LocalDateTime.parse(startTimeStr);
+        String endTimeStr = split[6];
+        LocalDateTime endTime = null;
+        if (!endTimeStr.equals("null")) endTime = LocalDateTime.parse(endTimeStr);
+        int duration = Integer.parseInt(split[7]);
         switch (type) {
-            case TASK -> task = new Task(name, desc, status, id);
+            case TASK -> task = new Task(name, desc, status, id, startTime, duration);
             case EPIC -> task = new Epic(name, desc, id);
-            case SUBTASK -> task = new SubTask(name, desc, status, id, Integer.parseInt(split[5]));
+            case SUBTASK -> task = new SubTask(name, desc, status, id, startTime, duration, Integer.parseInt(split[8]));
         }
         return task;
     }
