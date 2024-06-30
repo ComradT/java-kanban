@@ -330,48 +330,44 @@ public class HttpTaskManagerTasksTest {
         String taskJson = gson.toJson(newEpic);
 
         // создаём HTTP-клиент и запрос
-        HttpResponse<String> response;
-        SubTask subTask;
-        SubTask subTaskTmp;
-        try (HttpClient client = HttpClient.newHttpClient()) {
-            URI url = URI.create("http://localhost:8080/epics");
-            HttpRequest request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(taskJson))
-                    .build();
+        HttpClient client = HttpClient.newHttpClient();
+        URI url = URI.create("http://localhost:8080/epics");
+        HttpRequest request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(taskJson))
+                .build();
 
-            // вызываем рест, отвечающий за создание задач
-            response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            // проверяем код ответа
-            assertEquals(201, response.statusCode());
-
-            // проверяем, что создалась одна задача с корректным именем
-            epicTmp = taskManager.getEpicById(epic.getId());
-            assertEquals("NewEpic", epicTmp.getName(), "Некорректное имя задачи");
-            assertEquals("NewDesc", epicTmp.getDescription(), "Некорректное описание");
-
-            subTask = new SubTask("newSub", "subdesc", Status.IN_PROGRESS,
-                    LocalDateTime.now(), 5, epic.getId());
-            subTask = taskManager.createSubTask(subTask);
-            SubTask newSubtask = new SubTask("newSub", "newSubdesc", Status.DONE,
-                    subTask.getId(), LocalDateTime.now(), 60, epic.getId());
-
-            subTaskTmp = taskManager.getSubTaskById(subTask.getId());
-            assertEquals("Sub", subTaskTmp.getName(), "Некорректное имя задачи1");
-            assertEquals("subdesc", subTaskTmp.getDescription(), "Некорректное описание");
-
-            String subtaskJson = gson.toJson(newSubtask);
-            url = URI.create("http://localhost:8080/subtasks");
-            request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(subtaskJson))
-                    .build();
-            response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        }
+        // вызываем рест, отвечающий за создание задач
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        // проверяем код ответа
         assertEquals(201, response.statusCode());
 
         // проверяем, что создалась одна задача с корректным именем
-        subTaskTmp = taskManager.getSubTaskById(subTask.getId());
+        epicTmp = taskManager.getEpicById(epic.getId());
+        assertEquals("NewEpic", epicTmp.getName(), "Некорректное имя задачи");
+        assertEquals("NewDesc", epicTmp.getDescription(), "Некорректное описание");
 
-        assertEquals("Sub", subTaskTmp.getName(), "Некорректное имя задачи2");
-        assertEquals("newSubdesc", subTaskTmp.getDescription(), "Некорректное описание");
-        assertEquals(Status.DONE, subTaskTmp.getStatus(), "Некорректный статус");
+        SubTask subtask = new SubTask("Sub", "subdesc", Status.IN_PROGRESS,
+                LocalDateTime.now(), 5, epic.getId());
+        subtask = taskManager.createSubTask(subtask);
+        SubTask newSubtask = new SubTask("newSub", "newSubdesc", Status.DONE,
+                subtask.getId(), LocalDateTime.now(), 60, epic.getId());
+
+        SubTask subtaskTmp = taskManager.getSubTaskById(subtask.getId());
+        assertEquals("Sub", subtaskTmp.getName(), "Некорректное имя задачи");
+        assertEquals("subdesc", subtaskTmp.getDescription(), "Некорректное описание");
+
+        String subtaskJson = gson.toJson(newSubtask);
+        url = URI.create("http://localhost:8080/subtasks");
+        request = HttpRequest.newBuilder().uri(url).POST(HttpRequest.BodyPublishers.ofString(subtaskJson))
+                .build();
+        response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        assertEquals(201, response.statusCode());
+
+        // проверяем, что создалась одна задача с корректным именем
+        subtaskTmp = taskManager.getSubTaskById(subtask.getId());
+
+        assertEquals("newSub", subtaskTmp.getName(), "Некорректное имя задачи");
+        assertEquals("newSubdesc", subtaskTmp.getDescription(), "Некорректное описание");
+        assertEquals(Status.DONE, subtaskTmp.getStatus(), "Некорректный статус");
     }
 
     @Test
