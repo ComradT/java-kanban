@@ -6,7 +6,10 @@ import enums.TaskType;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
+
+import com.google.gson.reflect.TypeToken;
 
 public class Task implements Comparable<Task> {
 
@@ -151,6 +154,10 @@ public class Task implements Comparable<Task> {
     @Override
     public int compareTo(Task task) {
         return Comparator.comparing(Task::getStartTime).thenComparing(Task::getTaskType).compare(this, task);
+    }
+
+    public static class TaskListTypeToken extends TypeToken<List<Task>> {
+
     }
 
 }

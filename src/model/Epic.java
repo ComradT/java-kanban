@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-
+import com.google.gson.reflect.TypeToken;
 
 public class Epic extends Task {
 
@@ -98,6 +98,10 @@ public class Epic extends Task {
         if (subtask != super.getId()) {
             subTasksIds.add(subtask);
         }
+    }
+
+    public static class EpicListTypeToken extends TypeToken<List<Epic>> {
+
     }
 }
 
