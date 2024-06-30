@@ -347,11 +347,11 @@ public class HttpTaskManagerTasksTest {
         assertEquals(201, response.statusCode());
 
         // проверяем, что создалась одна задача с корректным именем
-        subtaskTmp = taskManager.getSubTaskById(newSubtask.getId());
+        subtaskTmp = taskManager.getSubTaskById(subtask.getId());
 
-        assertEquals("newSub", subtaskTmp.getName(), "Некорректное имя задачи");
-        assertEquals("newSubdesc", subtaskTmp.getDescription(), "Некорректное описание");
-        assertEquals(Status.DONE, subtaskTmp.getStatus(), "Некорректный статус");
+        assertEquals("Sub", subtaskTmp.getName(), "Некорректное имя задачи");
+        assertEquals("Subdesc", subtaskTmp.getDescription(), "Некорректное описание");
+        assertEquals(Status.IN_PROGRESS, subtaskTmp.getStatus(), "Некорректный статус");
     }
 
     @Test
