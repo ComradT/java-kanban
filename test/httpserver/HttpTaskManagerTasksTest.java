@@ -350,7 +350,7 @@ public class HttpTaskManagerTasksTest {
         subtaskTmp = taskManager.getSubTaskById(subtask.getId());
 
         assertEquals("Sub", subtaskTmp.getName(), "Некорректное имя задачи");
-        assertEquals("Subdesc", subtaskTmp.getDescription(), "Некорректное описание");
+        assertEquals("subdesc", subtaskTmp.getDescription(), "Некорректное описание");
         assertEquals(Status.IN_PROGRESS, subtaskTmp.getStatus(), "Некорректный статус");
     }
 
