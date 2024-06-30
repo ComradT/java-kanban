@@ -352,7 +352,7 @@ public class HttpTaskManagerTasksTest {
                 subtask.getId(), LocalDateTime.now(), 60, epic.getId());
 
         SubTask subtaskTmp = taskManager.getSubTaskById(subtask.getId());
-        assertEquals("Sub", subtaskTmp.getName(), "Некорректное имя задачи");
+        assertEquals("Sub", subtaskTmp.getName(), "Некорректное имя задачи1");
         assertEquals("subdesc", subtaskTmp.getDescription(), "Некорректное описание");
 
         String subtaskJson = gson.toJson(newSubtask);
@@ -365,7 +365,7 @@ public class HttpTaskManagerTasksTest {
         // проверяем, что создалась одна задача с корректным именем
         subtaskTmp = taskManager.getSubTaskById(subtask.getId());
 
-        assertEquals("newSub", subtaskTmp.getName(), "Некорректное имя задачи");
+        assertEquals("newSub", subtaskTmp.getName(), "Некорректное имя задачи2");
         assertEquals("newSubdesc", subtaskTmp.getDescription(), "Некорректное описание");
         assertEquals(Status.DONE, subtaskTmp.getStatus(), "Некорректный статус");
     }
