@@ -315,8 +315,7 @@ public class HttpTaskServer implements HttpHandler {
     }
 
     public static void main(String[] args) throws IOException {
-        HttpTaskServer httpTaskServer = new HttpTaskServer(Managers.
-                getFileBackedTaskManager(new File("resources/file.csv")));
+        HttpTaskServer httpTaskServer = new HttpTaskServer(Managers.getFileBackedTaskManager(new File("resources/file.csv")));
         httpServer.createContext("/tasks", httpTaskServer);
         httpServer.createContext("/subtasks", httpTaskServer);
         httpServer.createContext("/epics", httpTaskServer);
