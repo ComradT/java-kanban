@@ -5,6 +5,6 @@ public enum Endpoint {
     SUBTASKS,
     EPICS,
     HISTORY,
-    PRIORTIZED,
+    PRIORITIZED,
     UNKNOWN
 }

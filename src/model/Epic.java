@@ -100,9 +100,9 @@ public class Epic extends Task {
         }
     }
 
-    public static class EpicListTypeToken extends TypeToken<List<Epic>> {
+   /* public static class EpicListTypeToken extends TypeToken<List<Epic>> {
 
-    }
+    }*/
 }
 
 

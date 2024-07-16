@@ -4,6 +4,7 @@ package httpserver;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
 import service.Managers;
 import interfaces.TaskManager;
 import org.junit.jupiter.api.Test;
@@ -224,7 +225,7 @@ public class HttpTaskManagerTasksTest {
             response = client.send(request, HttpResponse.BodyHandlers.ofString());
             assertEquals(200, response.statusCode());
             jsonElement = JsonParser.parseString(response.body());
-            List<Epic> tasksFromManager = gson.fromJson(jsonElement, new Epic.EpicListTypeToken().getType());
+            List<Epic> tasksFromManager = gson.fromJson(jsonElement, new TypeToken<Epic>(){}.getType());
             epic = tasksFromManager.getFirst();
 
             assertNotNull(tasksFromManager, "Задачи не возвращаются");
@@ -376,7 +377,7 @@ public class HttpTaskManagerTasksTest {
 
             jsonElement = JsonParser.parseString(response.body());
             // проверяем, что создалась одна задача с корректным именем
-            List<Epic> tasksFromManager = gson.fromJson(jsonElement, new Epic.EpicListTypeToken().getType());
+            List<Epic> tasksFromManager = gson.fromJson(jsonElement, new TypeToken<Epic>(){}.getType());
 
             assertNotNull(tasksFromManager, "Задачи не возвращаются");
             assertEquals(2, tasksFromManager.size(), "Некорректное количество задач");

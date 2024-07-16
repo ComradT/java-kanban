@@ -54,7 +54,7 @@ public class HttpTaskServer implements HttpHandler {
                 handleHistory(exchange);
                 break;
             }
-            case PRIORTIZED: {
+            case PRIORITIZED: {
                 handlePrioritized(exchange);
                 break;
             }
@@ -68,62 +68,74 @@ public class HttpTaskServer implements HttpHandler {
         String requestMethod = exchange.getRequestMethod();
         switch (requestMethod) {
             case "GET":
-                if (pathParts.length == 2) {
-                    List<Task> tasks = taskManager.getTasksList();
-
-                    Gson gson = getGsonBuilder();
-                    String tasksJson = gson.toJson(tasks);
-                    BaseHttpHandler.sendAnswerJson(exchange, tasksJson);
-                } else {
-                    Optional<Integer> taskId = getTaskId(exchange);
-                    if (taskId.isEmpty()) {
-                        BaseHttpHandler.sendText(exchange, "Некорректно указан taskId", 400);
-                        return;
-                    }
-                    try {
-                        Task task = taskManager.getTaskById(taskId.get());
-                        Gson gson = getGsonBuilder();
-                        String taskJson = gson.toJson(task);
-                        BaseHttpHandler.sendAnswerJson(exchange, taskJson);
-                    } catch (NoSuchElementException e) {
-                        BaseHttpHandler.sendNotFound(exchange);
-                    }
-                }
+                extractedGetTasks(exchange, pathParts);
                 break;
             case "POST":
-                InputStream inputStream = exchange.getRequestBody();
-                String taskJson = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-                Gson gson = getGsonBuilder();
-                Task task = gson.fromJson(taskJson, Task.class);
-                Optional<Integer> taskId = Optional.of(task.getId());
-                try {
-                    if (taskId.get() == 0) {
-                        taskManager.createTask(task);
-                    } else {
-                        taskManager.updateTask(task);
-                    }
-                    BaseHttpHandler.sendHasInteractions(exchange);
-                } catch (DurationException e) {
-                    BaseHttpHandler.sendText(exchange, e.getMessage(), 406);
-                } catch (NoSuchElementException e) {
-                    BaseHttpHandler.sendNotFound(exchange);
-                }
+                extractedPostTasks(exchange);
                 break;
             case "DELETE":
-                Optional<Integer> taskDelId = getTaskId(exchange);
-                if (taskDelId.isEmpty()) {
-                    BaseHttpHandler.sendText(exchange, "Некорректно указан taskId", 400);
-                    return;
-                }
-                try {
-                    taskManager.removeTaskId(taskDelId.get());
-                    BaseHttpHandler.sendText(exchange, "Task удален", 200);
-                } catch (NoSuchElementException e) {
-                    BaseHttpHandler.sendNotFound(exchange);
-                } catch (Exception e) {
-                    System.out.println(e.getMessage());
-                }
+                extractedDeleteTasks(exchange);
                 break;
+        }
+    }
+
+    private void extractedDeleteTasks(HttpExchange exchange) throws IOException {
+        Optional<Integer> taskDelId = getTaskId(exchange);
+        if (taskDelId.isEmpty()) {
+            BaseHttpHandler.sendText(exchange, "Некорректно указан taskId", 400);
+            return;
+        }
+        try {
+            taskManager.removeTaskId(taskDelId.get());
+            BaseHttpHandler.sendText(exchange, "Task удален", 200);
+        } catch (NoSuchElementException e) {
+            BaseHttpHandler.sendNotFound(exchange);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void extractedGetTasks(HttpExchange exchange, String[] pathParts) throws IOException {
+        if (pathParts.length == 2) {
+            List<Task> tasks = taskManager.getTasksList();
+
+            Gson gson = getGsonBuilder();
+            String tasksJson = gson.toJson(tasks);
+            BaseHttpHandler.sendAnswerJson(exchange, tasksJson);
+        } else {
+            Optional<Integer> taskId = getTaskId(exchange);
+            if (taskId.isEmpty()) {
+                BaseHttpHandler.sendText(exchange, "Некорректно указан taskId", 400);
+                return;
+            }
+            try {
+                Task task = taskManager.getTaskById(taskId.get());
+                Gson gson = getGsonBuilder();
+                String taskJson = gson.toJson(task);
+                BaseHttpHandler.sendAnswerJson(exchange, taskJson);
+            } catch (NoSuchElementException e) {
+                BaseHttpHandler.sendNotFound(exchange);
+            }
+        }
+    }
+
+    private static void extractedPostTasks(HttpExchange exchange) throws IOException {
+        InputStream inputStream = exchange.getRequestBody();
+        String taskJson = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        Gson gson = getGsonBuilder();
+        Task task = gson.fromJson(taskJson, Task.class);
+        Optional<Integer> taskId = Optional.of(task.getId());
+        try {
+            if (taskId.get() == 0) {
+                taskManager.createTask(task);
+            } else {
+                taskManager.updateTask(task);
+            }
+            BaseHttpHandler.sendHasInteractions(exchange);
+        } catch (DurationException e) {
+            BaseHttpHandler.sendText(exchange, e.getMessage(), 406);
+        } catch (NoSuchElementException e) {
+            BaseHttpHandler.sendNotFound(exchange);
         }
     }
 
@@ -132,60 +144,72 @@ public class HttpTaskServer implements HttpHandler {
         String requestMethod = exchange.getRequestMethod();
         switch (requestMethod) {
             case "GET":
-                if (pathParts.length == 2) {
-                    List<SubTask> subtask = taskManager.getSubtaskList();
-
-                    Gson gson = getGsonBuilder();
-                    String tasksJson = gson.toJson(subtask);
-                    BaseHttpHandler.sendAnswerJson(exchange, tasksJson);
-                } else {
-                    Optional<Integer> taskId = getTaskId(exchange);
-                    if (taskId.isEmpty()) {
-                        BaseHttpHandler.sendText(exchange, "Некорректно указан taskId", 400);
-                        return;
-                    }
-                    try {
-                        SubTask subtask = taskManager.getSubTaskById(taskId.get());
-                        Gson gson = getGsonBuilder();
-                        String taskJson = gson.toJson(subtask);
-                        BaseHttpHandler.sendAnswerJson(exchange, taskJson);
-                    } catch (NoSuchElementException e) {
-                        BaseHttpHandler.sendNotFound(exchange);
-                    }
-                }
+                extractedGetSubTasks(exchange, pathParts);
                 break;
             case "POST":
-                InputStream inputStream = exchange.getRequestBody();
-                String taskJson = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-                Gson gson = getGsonBuilder();
-                SubTask subtask = gson.fromJson(taskJson, SubTask.class);
-                Optional<Integer> taskId = Optional.of(subtask.getId());
-                try {
-                    if (taskId.get() == 0) {
-                        taskManager.createSubTask(subtask);
-                    } else {
-                        taskManager.updateSubTask(subtask);
-                    }
-                    BaseHttpHandler.sendHasInteractions(exchange);
-                } catch (DurationException e) {
-                    BaseHttpHandler.sendText(exchange, e.getMessage(), 406);
-                } catch (NoSuchElementException e) {
-                    BaseHttpHandler.sendNotFound(exchange);
-                }
+                extractedPostSubTasks(exchange);
                 break;
             case "DELETE":
-                Optional<Integer> taskDelId = getTaskId(exchange);
-                if (taskDelId.isEmpty()) {
-                    BaseHttpHandler.sendText(exchange, "Некорректно указан taskId", 400);
-                    return;
-                }
-                try {
-                    taskManager.removeSubTaskId(taskDelId.get());
-                    BaseHttpHandler.sendText(exchange, "Subtask удален", 200);
-                } catch (NoSuchElementException e) {
-                    BaseHttpHandler.sendNotFound(exchange);
-                }
+                extractedDeleteSubTasks(exchange);
                 break;
+        }
+    }
+
+    private void extractedDeleteSubTasks(HttpExchange exchange) throws IOException {
+        Optional<Integer> taskDelId = getTaskId(exchange);
+        if (taskDelId.isEmpty()) {
+            BaseHttpHandler.sendText(exchange, "Некорректно указан taskId", 400);
+            return;
+        }
+        try {
+            taskManager.removeSubTaskId(taskDelId.get());
+            BaseHttpHandler.sendText(exchange, "Subtask удален", 200);
+        } catch (NoSuchElementException e) {
+            BaseHttpHandler.sendNotFound(exchange);
+        }
+    }
+
+    private static void extractedPostSubTasks(HttpExchange exchange) throws IOException {
+        InputStream inputStream = exchange.getRequestBody();
+        String taskJson = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        Gson gson = getGsonBuilder();
+        SubTask subtask = gson.fromJson(taskJson, SubTask.class);
+        Optional<Integer> taskId = Optional.of(subtask.getId());
+        try {
+            if (taskId.get() == 0) {
+                taskManager.createSubTask(subtask);
+            } else {
+                taskManager.updateSubTask(subtask);
+            }
+            BaseHttpHandler.sendHasInteractions(exchange);
+        } catch (DurationException e) {
+            BaseHttpHandler.sendText(exchange, e.getMessage(), 406);
+        } catch (NoSuchElementException e) {
+            BaseHttpHandler.sendNotFound(exchange);
+        }
+    }
+
+    private void extractedGetSubTasks(HttpExchange exchange, String[] pathParts) throws IOException {
+        if (pathParts.length == 2) {
+            List<SubTask> subtask = taskManager.getSubtaskList();
+
+            Gson gson = getGsonBuilder();
+            String tasksJson = gson.toJson(subtask);
+            BaseHttpHandler.sendAnswerJson(exchange, tasksJson);
+        } else {
+            Optional<Integer> taskId = getTaskId(exchange);
+            if (taskId.isEmpty()) {
+                BaseHttpHandler.sendText(exchange, "Некорректно указан taskId", 400);
+                return;
+            }
+            try {
+                SubTask subtask = taskManager.getSubTaskById(taskId.get());
+                Gson gson = getGsonBuilder();
+                String taskJson = gson.toJson(subtask);
+                BaseHttpHandler.sendAnswerJson(exchange, taskJson);
+            } catch (NoSuchElementException e) {
+                BaseHttpHandler.sendNotFound(exchange);
+            }
         }
     }
 
@@ -194,76 +218,88 @@ public class HttpTaskServer implements HttpHandler {
         String requestMethod = exchange.getRequestMethod();
         switch (requestMethod) {
             case "GET":
-                if (pathParts.length == 2) {
-                    List<Epic> epics = taskManager.getEpicList();
-
-                    Gson gson = getGsonBuilder();
-                    String tasksJson = gson.toJson(epics);
-                    BaseHttpHandler.sendAnswerJson(exchange, tasksJson);
-                } else if (pathParts.length == 4) {
-                    Optional<Integer> taskId = getTaskId(exchange);
-                    if (taskId.isEmpty()) {
-                        BaseHttpHandler.sendText(exchange, "Некорректно указан taskId", 400);
-                        return;
-                    }
-                    try {
-                        taskManager.getEpicById(taskId.get());
-                        List<SubTask> subTasks = taskManager.getSubtasksByEpic(taskId.get());
-                        Gson gson = getGsonBuilder();
-                        String taskJson = gson.toJson(subTasks);
-                        BaseHttpHandler.sendAnswerJson(exchange, taskJson);
-                    } catch (NoSuchElementException e) {
-                        BaseHttpHandler.sendNotFound(exchange);
-                    }
-
-                } else {
-                    Optional<Integer> taskId = getTaskId(exchange);
-                    if (taskId.isEmpty()) {
-                        BaseHttpHandler.sendText(exchange, "Некорректно указан taskId", 400);
-                        return;
-                    }
-                    try {
-                        Epic epic = taskManager.getEpicById(taskId.get());
-                        Gson gson = getGsonBuilder();
-                        String taskJson = gson.toJson(epic);
-                        BaseHttpHandler.sendAnswerJson(exchange, taskJson);
-                    } catch (NoSuchElementException e) {
-                        BaseHttpHandler.sendNotFound(exchange);
-                    }
-                }
+                extractedGetEpics(exchange, pathParts);
                 break;
             case "POST":
-                InputStream inputStream = exchange.getRequestBody();
-                String taskJson = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-                Gson gson = getGsonBuilder();
-                Epic epic = gson.fromJson(taskJson, Epic.class);
-                Optional<Integer> taskId = Optional.of(epic.getId());
-                try {
-                    if (taskId.get() == 0) {
-                        taskManager.createEpic(epic);
-                    } else {
-                        taskManager.updateEpic(epic);
-                    }
-                    BaseHttpHandler.sendHasInteractions(exchange);
-                } catch (DurationException e) {
-                    BaseHttpHandler.sendText(exchange, e.getMessage(), 406);
-                } catch (NoSuchElementException e) {
-                    BaseHttpHandler.sendNotFound(exchange);
-                }
+                extractedPostEpics(exchange);
                 break;
             case "DELETE":
-                Optional<Integer> taskDelId = getTaskId(exchange);
-                if (taskDelId.isEmpty()) {
-                    BaseHttpHandler.sendText(exchange, "Некорректно указан taskId", 400);
-                    return;
-                }
-                try {
-                    taskManager.removeEpicId(taskDelId.get());
-                    BaseHttpHandler.sendText(exchange, "Epic удален", 200);
-                } catch (NoSuchElementException e) {
-                    BaseHttpHandler.sendNotFound(exchange);
-                }
+                extractedDeleteEpics(exchange);
                 break;
+        }
+    }
+
+    private void extractedDeleteEpics(HttpExchange exchange) throws IOException {
+        Optional<Integer> taskDelId = getTaskId(exchange);
+        if (taskDelId.isEmpty()) {
+            BaseHttpHandler.sendText(exchange, "Некорректно указан taskId", 400);
+            return;
+        }
+        try {
+            taskManager.removeEpicId(taskDelId.get());
+            BaseHttpHandler.sendText(exchange, "Epic удален", 200);
+        } catch (NoSuchElementException e) {
+            BaseHttpHandler.sendNotFound(exchange);
+        }
+    }
+
+    private static void extractedPostEpics(HttpExchange exchange) throws IOException {
+        InputStream inputStream = exchange.getRequestBody();
+        String taskJson = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        Gson gson = getGsonBuilder();
+        Epic epic = gson.fromJson(taskJson, Epic.class);
+        Optional<Integer> taskId = Optional.of(epic.getId());
+        try {
+            if (taskId.get() == 0) {
+                taskManager.createEpic(epic);
+            } else {
+                taskManager.updateEpic(epic);
+            }
+            BaseHttpHandler.sendHasInteractions(exchange);
+        } catch (DurationException e) {
+            BaseHttpHandler.sendText(exchange, e.getMessage(), 406);
+        } catch (NoSuchElementException e) {
+            BaseHttpHandler.sendNotFound(exchange);
+        }
+    }
+
+    private void extractedGetEpics(HttpExchange exchange, String[] pathParts) throws IOException {
+        if (pathParts.length == 2) {
+            List<Epic> epics = taskManager.getEpicList();
+
+            Gson gson = getGsonBuilder();
+            String tasksJson = gson.toJson(epics);
+            BaseHttpHandler.sendAnswerJson(exchange, tasksJson);
+        } else if (pathParts.length == 4) {
+            Optional<Integer> taskId = getTaskId(exchange);
+            if (taskId.isEmpty()) {
+                BaseHttpHandler.sendText(exchange, "Некорректно указан taskId", 400);
+                return;
+            }
+            try {
+                taskManager.getEpicById(taskId.get());
+                List<SubTask> subTasks = taskManager.getSubtasksByEpic(taskId.get());
+                Gson gson = getGsonBuilder();
+                String taskJson = gson.toJson(subTasks);
+                BaseHttpHandler.sendAnswerJson(exchange, taskJson);
+            } catch (NoSuchElementException e) {
+                BaseHttpHandler.sendNotFound(exchange);
+            }
+
+        } else {
+            Optional<Integer> taskId = getTaskId(exchange);
+            if (taskId.isEmpty()) {
+                BaseHttpHandler.sendText(exchange, "Некорректно указан taskId", 400);
+                return;
+            }
+            try {
+                Epic epic = taskManager.getEpicById(taskId.get());
+                Gson gson = getGsonBuilder();
+                String taskJson = gson.toJson(epic);
+                BaseHttpHandler.sendAnswerJson(exchange, taskJson);
+            } catch (NoSuchElementException e) {
+                BaseHttpHandler.sendNotFound(exchange);
+            }
         }
     }
 
@@ -300,7 +336,7 @@ public class HttpTaskServer implements HttpHandler {
             case "subtasks" -> Endpoint.SUBTASKS;
             case "epics" -> Endpoint.EPICS;
             case "history" -> Endpoint.HISTORY;
-            case "prioritized" -> Endpoint.PRIORTIZED;
+            case "prioritized" -> Endpoint.PRIORITIZED;
             default -> Endpoint.UNKNOWN;
         };
     }
