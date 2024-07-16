@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-
 public class Epic extends Task {
 
     private final List<Integer> subTasksIds;
@@ -99,6 +98,7 @@ public class Epic extends Task {
             subTasksIds.add(subtask);
         }
     }
+
 }
 
 
